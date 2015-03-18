@@ -1,0 +1,39 @@
+# YAML example of the correct shape file
+-
+  - EXT_ID
+  - C
+  - 10
+- 
+  - TypeCode
+  - C
+  - 2
+- 
+  - RBDCode
+  - C
+  - 2
+- 
+  - UoMCode
+  - N
+- 
+  - ModelCode
+  - C
+  - 3
+- 
+  - SourceCode
+  - C
+  - 1
+- 
+  - AEP
+  - N
+- 
+  - Scenario
+  - C
+  - 1
+- 
+  - RunType
+  - C
+  - 1
+- 
+  - Status
+  - C
+  - 1
