@@ -30,7 +30,7 @@ setup(
     ],
     package_dir={'vshape': 'vshape'},
     include_package_data=True,
-    install_requires=['pyshp', 'Click', 'valideer'],
+    install_requires=['pyshp', 'click', 'valideer', 'PyYaml'],
     license='MIT',
     zip_safe=False,
     keywords='vshape, geo, gis, esri, shapefile, map',
