@@ -2,15 +2,13 @@
 vshape
 =============================
 
-
 Utilities for validating ESRI shape files.
 
 
 Features
 --------
 
-* Pre-Alpha 2 - experiments, development and planning!
-
+* Development Status :: 1 - Planning 
 
 Planning
 --------

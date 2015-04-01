@@ -23,7 +23,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 pyshape test
+	flake8 vshape test
 
 test:
 	py.test -v test/
@@ -32,15 +32,15 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source pyshape setup.py test
+	coverage run --source vshape setup.py test
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
 
 docs:
-	rm -f docs/pyshape.rst
+	rm -f docs/vshape.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ pyshape
+	sphinx-apidoc -o docs/ vshape
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
