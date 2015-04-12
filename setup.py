@@ -10,18 +10,12 @@ except ImportError:
 
 
 readme = open('README.rst').read()
-doclink = """
-Documentation
--------------
-
-The full documentation is at http://vshape.rtfd.org."""
-history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='vshape',
-    version='0.0.1',
+    version='0.1.0',
     description='Utilities for validating ESRI shape files.',
-    long_description=readme + '\n\n' + doclink + '\n\n' + history,
+    long_description=readme,
     author='Jakub Jarosz',
     author_email='qba73@postpro.net',
     url='https://github.com/qba73/vshape',
@@ -30,12 +24,13 @@ setup(
     ],
     package_dir={'vshape': 'vshape'},
     include_package_data=True,
-    install_requires=['pyshp', 'click', 'valideer', 'PyYaml'],
+    install_requires=[
+        ],
     license='MIT',
     zip_safe=False,
-    keywords='vshape, geo, gis, esri, shapefile, map',
+    keywords='shape, geo, gis, esri, shapefile, map',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: GIS',
