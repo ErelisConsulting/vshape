@@ -91,19 +91,11 @@ def validate_field3(pos, template_fields, fields):
 
 
 # ===================
-# Value validators
+# Validators
 # ===================
 
 def validate_not_null(field_no, config, records):
     return all([record[field_no] for record in records])
-
-
-def validate_typecode(record, field_no, allowed_values):
-    return record[field_no] in allowed_values
-    
-
-def validate_rbcode(record, field_no, allowed_values):
-    return record[field_no] in allowed_values
 
 
 # ===================
