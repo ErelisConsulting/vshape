@@ -9,6 +9,7 @@ is defined in the vshape.cfg file.
 import sys
 import os
 import collections
+import functools
 import ConfigParser
 import json
 import yaml
@@ -46,18 +47,7 @@ class Shaper(object):
 
 
 def connection(filepath):
-    """Factory function return shaper obj.
-    
-    Args:
-        filepath, path to the shape file
-
-    Returns:
-        instance of the Shaper obj
-
-    Raises:
-        ValueError if filepath is not a shapefile
-
-    """
+    """Factory function return shaper obj."""
     if filepath.endswith('shp'):
         shaper = Shaper
     else:
@@ -78,27 +68,31 @@ def template_fields(config):
     return [json.loads(item[1]) for item in config.items("Fields")]
 
 
-
 def shape_type(shape):
     """Return a shape type: polygon or multipolygon as string."""
     return shape.__geo_interface__["type"]
 
 
 # ===================
-#  Validators
+#  Field Validators
 # ===================
 
-def is_number_of_fields_ok(template, shape_file):
-    return len(fields_of(shape_file)) == len(template)
+
+def validate_field2(pos, template_fields, fields):
+    return (template_fields[pos][0] == fields[pos][0]) and\
+           (template_fields[pos][1] == fields[pos][1])
 
 
-def fields_the_same(template_fields, fields):
-    return template_fields == fields
-    #for i, field in enumerate(fields):
-    #    l = [item for item in fields[i] if item in template_fields[i]]
-    #    if l != template_fields[i]:
-    #        return False
-    #return True
+def validate_field3(pos, template_fields, fields):
+    return (template_fields[pos][0] == fields[pos][0]) and\
+           (template_fields[pos][1] == fields[pos][1]) and\
+           (template_fields[pos][2] == fields[pos][2])
+
+# Values validators
+
+
+
+
 
 
 
@@ -128,6 +122,21 @@ def main(argv):
     t_fields = template_fields(config)
     chf_fields = shape_file_data.fields
 
+
+    val_field_2 = functools.partial(validate_field2,
+                                    template_fields=t_fields,
+                                    fields=chf_fields)
+
+    val_field_3 = functools.partial(validate_field3,
+                                    template_fields=t_fields,
+                                    fields=chf_fields)
+
+    def validate_fields():
+        return all(map(val_field_2, (3, 6))) and\
+               all(map(val_field_3, (0, 1, 2, 4, 5, 7, 8, 9)))
+
+
+
     print("\n===========================================")
     print(" Fileshape check report:")
     print("===========================================")
@@ -148,10 +157,11 @@ def main(argv):
     for geom in shape_file_data.geometry:
         print("Number of {}s: {}".format(geom[0], geom[1]))
     print
-
-    print("Are fileds the same? {}".format(fields_the_same(t_fields, chf_fields)))
-
-
     
+    print("\nNumber of fields match? {}".format(len(t_fields) == len(chf_fields)))
+
+    print("Fields are valid? {}".format(validate_fields()))
+
+
 if __name__=="__main__":
     sys.exit(main(sys.argv))
