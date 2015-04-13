@@ -1,5 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Jakub Jarosz & Edita Laurinaviciute
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 """
 Module for validating shape files based on definaed criteria.
 Validation criteria (file structure) is defined in the vshape.cfg file.
@@ -11,7 +34,6 @@ import collections
 import functools
 import ConfigParser
 import json
-import yaml
 import shapefile
 
 
@@ -48,6 +70,11 @@ class Shaper(object):
         counter = collections.Counter(geometries)
         return counter.most_common()
 
+    @property
+    def coordinates(self):
+        """Return coordinates as a list."""
+        return self.sh.bbox
+
 
 def connection(filepath):
     """Factory function return shaper obj."""
@@ -79,20 +106,16 @@ def field_values(field_name, config):
 # Field Validators
 # ===================
 
-def validate_field2(pos, template_fields, fields):
-    return (template_fields[pos][0] == fields[pos][0]) and\
-           (template_fields[pos][1] == fields[pos][1])
+def validate_field2(position, template_fields, fields):
+    return (template_fields[position][0] == fields[position][0]) and\
+           (template_fields[position][1] == fields[position][1])
 
 
-def validate_field3(pos, template_fields, fields):
-    return (template_fields[pos][0] == fields[pos][0]) and\
-           (template_fields[pos][1] == fields[pos][1]) and\
-           (template_fields[pos][2] == fields[pos][2])
+def validate_field3(position, template_fields, fields):
+    return (template_fields[position][0] == fields[position][0]) and\
+           (template_fields[position][1] == fields[position][1]) and\
+           (template_fields[position][2] == fields[position][2])
 
-
-# ===================
-# Validators
-# ===================
 
 def validate_not_null(field_no, config, records):
     return all([record[field_no] for record in records])
@@ -104,11 +127,11 @@ def validate_not_null(field_no, config, records):
 
 def main(argv):
     if len(argv) < 2:
-        sys.stderr.write("Usage: python {} <shapefile to process>\n".format(argv[0],))
+        sys.stderr.write("\nUsage: python {} <shapefile to process>\n".format(argv[0],))
         return 1
 
     if not os.path.exists(argv[1]):
-        sys.stderr.write("Error, the shape file {} was not found!\n".format(argv[1]))
+        sys.stderr.write("\nError, the shape file {} was not found!\n".format(argv[1]))
         return 1
 
     this_dir = os.path.abspath(os.path.dirname(__file__))
@@ -192,7 +215,8 @@ def main(argv):
 
     for geom in shape_data.geometry:
         print("Number of {}s: {}".format(geom[0], geom[1]))
-    
+   
+    print("\nCoordinates: {}".format(shape_data.coordinates))
     print("\nNumber of fields match: {}".format(len(t_fields) == len(chf_fields)))
     print("Fields are valid: {}".format(validate_fields()))
     print("Values are not null: {}".format(validate_not_null_values()))
