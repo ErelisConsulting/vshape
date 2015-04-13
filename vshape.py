@@ -72,6 +72,8 @@ def connect_to_shapefile(filepath):
 def template_fields(config):
     return [json.loads(item[1]) for item in config.items("Fields")]
 
+def field_values(field_name, config):
+    return json.loads(config.get("Values", field_name))
 
 
 # ===================
@@ -97,10 +99,13 @@ def validate_not_null(field_no, config, records):
     return all([record[field_no] for record in records])
 
 
-def validate_typecode(config, record, field_no=1, record_name='typecode'):
-
-    return str(record[field_no]) in (config.get("Values", record_name))
+def validate_typecode(record, field_no, allowed_values):
+    return record[field_no] in allowed_values
     
+
+def validate_rbcode(record, field_no, allowed_values):
+    return record[field_no] in allowed_values
+
 
 
 # ===================
@@ -118,18 +123,27 @@ def main(argv):
 
     this_dir = os.path.abspath(os.path.dirname(__file__))
 
+    # Read shapefile requirements
     config = ConfigParser.RawConfigParser(allow_no_value=True)
     config.read(os.path.join(this_dir, 'vshape.cfg'))
-    example_file = os.path.join(this_dir, 'valid_shape.yml')
+    t_fields = template_fields(config)  # defined fields in the config file
     
+    # Allowed values of each field in the shapefile
+    values_of_field = functools.partial(field_values, config=config)
+    typecode_values = values_of_field('typecode')
+    rbdcode_values = values_of_field('rbdcode')
+    sourcecode_values = values_of_field('sourcecode')
+    scenario_values = values_of_field('scenario')
+    runtype_values = values_of_field('runtype')
+    status_values = values_of_field('status')
+
+    # Reading shape file
     shapefile = os.path.join(this_dir, argv[1])
+    shape_data = connect_to_shapefile(shapefile)    
+    records = shape_data.records
+    chf_fields = shape_data.fields      # actual fields read from the shapefile
 
-    shape_file_data = connect_to_shapefile(shapefile)
     
-    t_fields = template_fields(config)
-    chf_fields = shape_file_data.fields
-    records = shape_file_data.records
-
     val_field_2 = functools.partial(validate_field2,
                                     template_fields=t_fields,
                                     fields=chf_fields)
@@ -149,11 +163,8 @@ def main(argv):
     def validate_not_null_values():
         return all(map(val_not_null, (0, 3, 4, 6)))
 
-    #val_correct_values = functools.partial(validate_correct_values,
-    #                                       config=config,
-    #                                       records=records)
 
-    print validate_typecode(config, records[0])
+    fl_values = functools.partial(field_values, config=config)
 
     print("\n===========================================")
     print(" Fileshape check report:")
@@ -171,16 +182,14 @@ def main(argv):
 
    
     print("\nShapes and geometries:\n")
-    print("Total number of shapes in the shapefile: {}".format(len(shape_file_data.shapes)))
-    for geom in shape_file_data.geometry:
+    print("Total number of shapes in the shapefile: {}".format(len(shape_data.shapes)))
+    for geom in shape_data.geometry:
         print("Number of {}s: {}".format(geom[0], geom[1]))
     print
     
     print("\nNumber of fields match? {}".format(len(t_fields) == len(chf_fields)))
 
     print("Fields are valid? {}".format(validate_fields()))
-    print("Records: ")
-    print(shape_file_data.records)
 
 
     print("Validate not null {}".format(validate_not_null_values()))
