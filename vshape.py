@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Module for validating shape files based on
-definaed criteria. Validation criteria (file structure)
-is defined in the vshape.cfg file.
+Module for validating shape files based on definaed criteria.
+Validation criteria (file structure) is defined in the vshape.cfg file.
 
 """
 import sys
@@ -12,11 +11,11 @@ import collections
 import functools
 import ConfigParser
 import json
+import yaml
 import shapefile
 
 
-__version__="0.1.0"
-
+__version__ = "0.1.0"
 
 
 class Shaper(object):
@@ -71,14 +70,14 @@ def connect_to_shapefile(filepath):
 def template_fields(config):
     return [json.loads(item[1]) for item in config.items("Fields")]
 
+
 def field_values(field_name, config):
     return json.loads(config.get("Values", field_name))
 
 
 # ===================
-#  Field Validators
+# Field Validators
 # ===================
-
 
 def validate_field2(pos, template_fields, fields):
     return (template_fields[pos][0] == fields[pos][0]) and\
@@ -91,8 +90,9 @@ def validate_field3(pos, template_fields, fields):
            (template_fields[pos][2] == fields[pos][2])
 
 
-# Values validators
-
+# ===================
+# Value validators
+# ===================
 
 def validate_not_null(field_no, config, records):
     return all([record[field_no] for record in records])
@@ -106,9 +106,8 @@ def validate_rbcode(record, field_no, allowed_values):
     return record[field_no] in allowed_values
 
 
-
 # ===================
-#  Main
+# Main
 # ===================
 
 def main(argv):
@@ -141,8 +140,8 @@ def main(argv):
     shape_data = connect_to_shapefile(shapefile)    
     records = shape_data.records
     chf_fields = shape_data.fields      # actual fields read from the shapefile
-
-    
+   
+    # Validating existence and types of fields in the shapefile
     val_field_2 = functools.partial(validate_field2,
                                     template_fields=t_fields,
                                     fields=chf_fields)
@@ -163,7 +162,21 @@ def main(argv):
         return all(map(val_not_null, (0, 3, 4, 6)))
 
 
-    fl_values = functools.partial(field_values, config=config)
+    # Validating if records in the shapefile have only allowed values
+
+    def are_values_in_record_correct(record):
+        return all([record[1] in typecode_values,
+                    record[2] in rbdcode_values,
+                    record[5] in sourcecode_values,
+                    record[7] in scenario_values,
+                    record[8] in runtype_values,
+                    record[9] in status_values])
+
+    def are_all_records_correct():
+        return all([are_values_in_record_correct(record) for record in shape_data.records])
+           
+
+    # Reporting
 
     print("\n===========================================")
     print(" Fileshape check report:")
@@ -180,19 +193,18 @@ def main(argv):
         print(f)
 
    
-    print("\nShapes and geometries:\n")
-    print("Total number of shapes in the shapefile: {}".format(len(shape_data.shapes)))
+    print("\n===========================================")
+    print("Shapes and geometries:")
+    print("===========================================")
+    print("\nTotal number of shapes in the shapefile: {}".format(len(shape_data.shapes)))
+
     for geom in shape_data.geometry:
         print("Number of {}s: {}".format(geom[0], geom[1]))
-    print
     
-    print("\nNumber of fields match? {}".format(len(t_fields) == len(chf_fields)))
-
-    print("Fields are valid? {}".format(validate_fields()))
-
-
-    print("Validate not null {}".format(validate_not_null_values()))
-    print("Validate values are correct {}".format(2))
+    print("\nNumber of fields match: {}".format(len(t_fields) == len(chf_fields)))
+    print("Fields are valid: {}".format(validate_fields()))
+    print("Values are not null: {}".format(validate_not_null_values()))
+    print("Field values are correct: {}\n".format(are_all_records_correct()))
 
 
 if __name__=="__main__":
