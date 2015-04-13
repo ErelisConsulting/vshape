@@ -39,6 +39,11 @@ class Shaper(object):
         return self.sh.shapes()
 
     @property
+    def records(self):
+        """Return a list of records in the shape file."""
+        return self.sh.records()
+
+    @property
     def geometry(self):
         """Return a number of each geometry in the shape file."""
         geometries = [shape.__geo_interface__['type'] for shape in self.shapes]
@@ -68,10 +73,6 @@ def template_fields(config):
     return [json.loads(item[1]) for item in config.items("Fields")]
 
 
-def shape_type(shape):
-    """Return a shape type: polygon or multipolygon as string."""
-    return shape.__geo_interface__["type"]
-
 
 # ===================
 #  Field Validators
@@ -88,12 +89,18 @@ def validate_field3(pos, template_fields, fields):
            (template_fields[pos][1] == fields[pos][1]) and\
            (template_fields[pos][2] == fields[pos][2])
 
+
 # Values validators
 
 
+def validate_not_null(field_no, config, records):
+    return all([record[field_no] for record in records])
 
 
+def validate_typecode(config, record, field_no=1, record_name='typecode'):
 
+    return str(record[field_no]) in (config.get("Values", record_name))
+    
 
 
 # ===================
@@ -121,7 +128,7 @@ def main(argv):
     
     t_fields = template_fields(config)
     chf_fields = shape_file_data.fields
-
+    records = shape_file_data.records
 
     val_field_2 = functools.partial(validate_field2,
                                     template_fields=t_fields,
@@ -135,7 +142,18 @@ def main(argv):
         return all(map(val_field_2, (3, 6))) and\
                all(map(val_field_3, (0, 1, 2, 4, 5, 7, 8, 9)))
 
+    val_not_null = functools.partial(validate_not_null,
+                                     config=config,
+                                     records=records)
 
+    def validate_not_null_values():
+        return all(map(val_not_null, (0, 3, 4, 6)))
+
+    #val_correct_values = functools.partial(validate_correct_values,
+    #                                       config=config,
+    #                                       records=records)
+
+    print validate_typecode(config, records[0])
 
     print("\n===========================================")
     print(" Fileshape check report:")
@@ -161,6 +179,12 @@ def main(argv):
     print("\nNumber of fields match? {}".format(len(t_fields) == len(chf_fields)))
 
     print("Fields are valid? {}".format(validate_fields()))
+    print("Records: ")
+    print(shape_file_data.records)
+
+
+    print("Validate not null {}".format(validate_not_null_values()))
+    print("Validate values are correct {}".format(2))
 
 
 if __name__=="__main__":
