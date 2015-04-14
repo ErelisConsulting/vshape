@@ -37,9 +37,6 @@ import json
 import shapefile
 
 
-__version__ = "0.1.0"
-
-
 class Shaper(object):
     def __init__(self, shape_file):
         self.shape_file = shape_file
