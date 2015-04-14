@@ -15,5 +15,5 @@ Shapefile validator
 Features
 --------
 
-* Validate shapefiles according rules described in a config file
+* Validate ESRI shapefiles according rules described in a config file
 
