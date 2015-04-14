@@ -27,7 +27,7 @@ lint:
 	flake8 vshape test
 
 test:
-	py.test
+	py.test test/
 
 test-all:
 	tox

@@ -15,5 +15,5 @@ Shapefile validator
 Features
 --------
 
-* TODO
+* Validate shapefiles according rules described in a config file
 
