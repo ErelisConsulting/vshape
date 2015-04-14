@@ -1,6 +1,19 @@
+"""
+Tests for `vshape` module.
+"""
 import pytest
-import vshape
+from vshape import vshape
 
 
-def test_read_config():
-    pass 
+class TestVshape(object):
+
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    def test_something(self):
+        pass
+
+    @classmethod
+    def teardown_class(cls):
+        pass
