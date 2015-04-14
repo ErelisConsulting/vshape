@@ -1,4 +1,4 @@
-.PHONY: help clean clean-pyc clean-build list test test-all coverage docs sdist
+.PHONY: help clean clean-pyc clean-build list test test-all coverage docs release sdist
 
 help:
 	@echo "clean-build - remove build artifacts"
@@ -8,6 +8,7 @@ help:
 	@echo "testall - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
+	@echo "release - package and upload a release"
 	@echo "sdist - package"
 
 clean: clean-build clean-pyc
@@ -26,7 +27,7 @@ lint:
 	flake8 vshape test
 
 test:
-	py.test -v test/
+	py.test
 
 test-all:
 	tox
@@ -45,11 +46,11 @@ docs:
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
 
-#release: clean
-#	python setup.py sdist upload
-#	python setup.py bdist_wheel upload
+release: clean
+	python setup.py sdist upload
+	python setup.py bdist_wheel upload
 
 sdist: clean
 	python setup.py sdist
-	python setup.py bdist_wheel
+	python setup.py bdist_wheel 
 	ls -l dist
