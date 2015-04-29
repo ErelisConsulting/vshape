@@ -9,10 +9,6 @@ except ImportError:
     from distutils.core import setup
 
 
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
-    sys.exit()
-
 readme = open('README.rst').read()
 doclink = """
 Documentation
@@ -23,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='vshape',
-    version='0.0.1',
+    version='0.1.0',
     description='Shapefile validator',
     long_description=readme + '\n\n' + doclink + '\n\n' + history,
     author='Jakub Jarosz',
@@ -40,7 +36,7 @@ setup(
     zip_safe=False,
     keywords='vshape',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 1 - Pre-Alpha',
         'Environment :: Console',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: GIS',
