@@ -10,11 +10,7 @@ except ImportError:
 
 
 readme = open('README.rst').read()
-doclink = """
-Documentation
--------------
 
-The full documentation is at http://vshape.rtfd.org."""
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
